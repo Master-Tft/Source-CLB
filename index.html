@@ -8,66 +8,67 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Inter:wght@300;400;600;700;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #05070a; color: #e2e8f0; scroll-behavior: smooth; overflow: hidden; }
-        .serif-font { font-family: 'Playfair Display', serif; }
-        
-        /* Glassmorphism Styles */
+        .gen-title { font-weight: 800; text-transform: uppercase; font-size: 3rem; letter-spacing: -2px; line-height: 1; }
         .glass-box { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(40px); border: 1px solid rgba(180, 83, 9, 0.3); }
         .card-bg { background: rgba(15, 23, 42, 0.4); border: 1px solid #1e293b; backdrop-filter: blur(10px); }
-        
-        .shimmer-text {
-            background: linear-gradient(to right, #b45309 20%, #fde68a 50%, #b45309 80%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shimmer 3s linear infinite;
-        }
+        .dropdown { position: relative; padding: 10px 0; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 120px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 10px 0; z-index: 1000; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 8px 15px; font-size: 10px; color: #94a3b8; transition: 0.3s; }
+        .dropdown-menu a:hover { background: rgba(180, 83, 9, 0.2); color: #f59e0b; }
+        .shimmer-text { background: linear-gradient(to right, #b45309 20%, #fde68a 50%, #b45309 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3s linear infinite; }
         @keyframes shimmer { to { background-position: 200% center; } }
-        
-        /* Auth & Admin Controls */
         .admin-only, .auth-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         .is-logged-in .auth-only { display: flex !important; }
         .is-logged-in .no-auth { display: none !important; }
-
         .page-view { display: none; width: 100vw; height: 100vh; overflow-y: auto; }
         .active-view { display: block; }
-        
-        /* Ô nhập liệu tối giản */
         .input-auth { width: 100%; background: #020617; border: 1px solid #1e293b; padding: 15px; border-radius: 12px; font-size: 14px; color: white; transition: 0.3s; }
-        .input-auth:focus { border-color: #b45309; outline: none; box-shadow: 0 0 15px rgba(180, 83, 9, 0.2); }
-        
-        /* Modal Popup */
+        .actor-card { transition: all 0.5s ease; border: 1px solid #1e293b; border-radius: 1.5rem; overflow: hidden; }
+        .actor-card:hover { border-color: #f59e0b; transform: translateY(-8px); }
         #policy-modal { display: none; position: fixed; inset: 0; z-index: 200; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); padding: 20px; }
         #policy-modal.active { display: flex; }
-
         section { padding: 120px 20px; }
     </style>
 </head>
 <body>
 
     <div id="policy-modal" class="animate__animated animate__fadeIn">
-        <div class="glass-box w-full max-w-2xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative animate__animated animate__zoomIn">
-            <button onclick="closePolicy()" class="absolute top-6 right-8 text-slate-500 hover:text-white transition-all"><i class="fas fa-times text-xl"></i></button>
-            <div id="policy-content" class="max-h-[70vh] overflow-y-auto pr-4"></div>
+        <div class="glass-box w-full max-w-2xl p-12 rounded-[2.5rem] shadow-2xl relative">
+            <button onclick="closePolicy()" class="absolute top-6 right-8 text-slate-500 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            <div id="policy-content" class="max-h-[70vh] overflow-y-auto pr-4 text-sm leading-relaxed text-slate-300"></div>
         </div>
     </div>
 
     <main id="view-main" class="page-view active-view">
         <nav class="fixed top-0 w-full z-[100] bg-[#05070a]/90 backdrop-blur-md border-b border-slate-800 px-6 py-4">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <a href="javascript:void(0)" onclick="showView('main')" class="serif-font text-2xl font-black italic text-amber-500 tracking-tighter">UNDERLIGHT</a>
-                
+                <a href="javascript:void(0)" onclick="showView('main')" class="font-black text-2xl italic text-amber-500 tracking-tighter">UNDERLIGHT</a>
                 <div class="hidden md:flex space-x-10 text-[10px] font-black tracking-[0.3em] uppercase text-slate-400 items-center">
-                    <a href="javascript:void(0)" onclick="window.scrollTo(0,0)" class="hover:text-white transition-all">Trang Chủ</a>
-                    <a href="javascript:void(0)" onclick="document.getElementById('members-section').scrollIntoView()" class="hover:text-white transition-all">Nghệ Sĩ</a>
-                    <a href="javascript:void(0)" onclick="document.getElementById('guide-section').scrollIntoView()" class="hover:text-white transition-all">Hướng Dẫn</a>
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <div class="no-auth">
-                        <button onclick="showView('auth')" class="bg-amber-900/20 border border-amber-700/50 text-amber-500 px-6 py-2 rounded-full text-[9px] font-black tracking-widest uppercase hover:bg-amber-600 transition-all">Đăng nhập</button>
+                    <a href="javascript:void(0)" onclick="showView('main')" class="hover:text-white transition-all">Trang Chủ</a>
+                    <div class="dropdown">
+                        <button class="hover:text-white transition-all flex items-center gap-2">Thế Hệ <i class="fas fa-chevron-down text-[7px]"></i></button>
+                        <div class="dropdown-menu animate__animated animate__fadeIn">
+                            <a href="javascript:void(0)" onclick="showGen('GEN 1')">GEN 1</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 2')">GEN 2</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 3')">GEN 3</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 4')">GEN 4</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 5')">GEN 5</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 6')">GEN 6</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 7')">GEN 7</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 8')">GEN 8</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 9')">GEN 9</a>
+                            <a href="javascript:void(0)" onclick="showGen('GEN 10')">GEN 10</a>
+                        </div>
                     </div>
+                    <a href="javascript:void(0)" onclick="showView('members')" class="hover:text-white transition-all">Nghệ Sĩ</a>
+                    <a href="javascript:void(0)" onclick="showView('guide')" class="hover:text-white transition-all">Hướng Dẫn</a>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="no-auth"><button onclick="showView('auth')" class="bg-amber-900/20 border border-amber-700/50 text-amber-500 px-6 py-2 rounded-full text-[9px] font-black tracking-widest uppercase hover:bg-amber-600 transition-all">Đăng nhập</button></div>
                     <div class="auth-only flex items-center gap-4">
                         <span id="userDisplay" class="text-amber-500 text-[9px] font-black uppercase tracking-widest italic border-r border-slate-800 pr-4"></span>
                         <button onclick="handleLogout()" class="text-slate-500 text-[9px] font-bold uppercase hover:text-red-500 transition-all">[ Logout ]</button>
@@ -76,18 +77,18 @@
             </div>
         </nav>
 
-        <section class="min-h-screen flex flex-col items-center justify-center text-center">
+        <section id="section-home" class="min-h-screen flex flex-col items-center justify-center text-center">
             <div class="w-64 h-64 md:w-80 md:h-80 mb-8 animate__animated animate__zoomIn">
                 <img src="https://i.ibb.co/99XfbWCS/image-3fe3a8.jpg" alt="Logo" class="w-full h-full object-contain rounded-full shadow-2xl border-4 border-amber-900/20">
             </div>
-            <h1 class="serif-font text-7xl md:text-9xl font-black uppercase shimmer-text italic tracking-tighter">UnderLight</h1>
+            <h1 class="text-7xl md:text-9xl font-black uppercase shimmer-text italic tracking-tighter">UnderLight</h1>
             <p class="text-amber-600 tracking-[0.5em] font-bold text-lg md:text-2xl uppercase italic mt-4 animate__animated animate__fadeInUp">Sau Ánh Hào Quang</p>
         </section>
 
-        <section id="members-section" class="bg-slate-950/20">
+        <section id="section-members" class="hidden p-10 bg-slate-950/20 pt-32 min-h-screen">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16 border-l-4 border-amber-600 pl-6">
-                    <h2 class="serif-font text-5xl text-white italic">Kịch Đoàn</h2>
+                    <h2 id="currentGenDisplay" class="gen-title text-white tracking-tighter italic">Nghệ Sĩ</h2>
                     <p class="text-slate-500 text-[9px] font-black tracking-widest uppercase mt-2 italic">// Artist Directory</p>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
@@ -95,11 +96,17 @@
                         <div class="bg-slate-900 border-l-4 border-amber-600 p-8 rounded-2xl shadow-2xl sticky top-24">
                             <h3 class="text-amber-500 font-black mb-6 text-[10px] uppercase tracking-widest italic font-bold">Thêm Nhân Sự</h3>
                             <div class="space-y-4">
-                                <input type="file" id="mFile" accept="image/*" class="w-full text-[9px] text-slate-500">
+                                <input type="file" id="mFile" accept="image/*" class="w-full text-[9px] text-slate-500 cursor-pointer">
+                                <select id="mGen" class="input-auth py-2 text-xs">
+                                    <option value="GEN 1">GEN 1</option><option value="GEN 2">GEN 2</option><option value="GEN 3">GEN 3</option>
+                                    <option value="GEN 4">GEN 4</option><option value="GEN 5">GEN 5</option><option value="GEN 6">GEN 6</option>
+                                    <option value="GEN 7">GEN 7</option><option value="GEN 8">GEN 8</option><option value="GEN 9">GEN 9</option>
+                                    <option value="GEN 10">GEN 10</option>
+                                </select>
                                 <input type="text" id="mName" placeholder="Tên nghệ sĩ..." class="input-auth py-2 text-xs">
                                 <input type="text" id="mRole" placeholder="Vai trò..." class="input-auth py-2 text-xs">
                                 <textarea id="mBio" placeholder="Giới thiệu..." class="input-auth text-xs h-24"></textarea>
-                                <button onclick="uploadAndPush()" id="submitBtn" class="w-full bg-amber-700 py-3 rounded-xl font-bold text-[9px] tracking-widest uppercase text-white shadow-lg">LƯU DỮ LIỆU</button>
+                                <button onclick="uploadAndPush()" id="submitBtn" class="w-full bg-amber-700 py-3 rounded-xl font-bold text-[9px] tracking-widest uppercase text-white shadow-lg transition-all">LƯU DỮ LIỆU</button>
                             </div>
                         </div>
                     </aside>
@@ -108,56 +115,20 @@
             </div>
         </section>
 
-        <section id="guide-section" class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="serif-font text-5xl font-black text-white italic uppercase mb-4 tracking-tight">Hướng Dẫn</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                <div class="card-bg p-10 rounded-3xl">
-                    <h4 class="font-black text-amber-500 text-[10px] uppercase tracking-widest mb-4">Khán Giả</h4>
-                    <p class="text-slate-400 text-xs italic">Xem danh sách kịch đoàn và thông tin chi tiết từng nghệ sĩ.</p>
-                </div>
-                <div class="card-bg p-10 rounded-3xl">
-                    <h4 class="font-black text-amber-500 text-[10px] uppercase tracking-widest mb-4">Đăng Ký</h4>
-                    <p class="text-slate-400 text-xs italic">Tạo tài khoản để tham gia cộng đồng yêu kịch UnderLight.</p>
-                </div>
-                <div class="card-bg p-10 rounded-3xl border-2 border-amber-900/30">
-                    <h4 class="font-black text-amber-500 text-[10px] uppercase tracking-widest mb-4">Admin</h4>
-                    <p class="text-slate-400 text-xs italic">Dành cho Đạo diễn: Quản lý hồ sơ nhân sự kịch đoàn.</p>
-                </div>
+        <section id="section-guide" class="hidden max-w-7xl mx-auto pt-32 min-h-screen text-center">
+            <h2 class="text-5xl font-black text-white italic uppercase mb-12">Hướng Dẫn</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div class="card-bg p-10 rounded-3xl"><h4 class="text-amber-500 text-[10px] font-black uppercase mb-4 tracking-widest">Khán Giả</h4><p class="text-slate-400 text-xs italic leading-relaxed">Sử dụng menu Thế Hệ để xem các khóa nghệ sĩ.</p></div>
+                <div class="card-bg p-10 rounded-3xl"><h4 class="text-amber-500 text-[10px] font-black uppercase mb-4 tracking-widest">Thành Viên</h4><p class="text-slate-400 text-xs italic leading-relaxed">Đăng ký để cập nhật tin tức mới nhất.</p></div>
+                <div class="card-bg p-10 rounded-3xl"><h4 class="text-amber-500 text-[10px] font-black uppercase mb-4 tracking-widest">Admin</h4><p class="text-slate-400 text-xs italic leading-relaxed">Dành cho Director: Quản lý nhân sự kịch đoàn.</p></div>
             </div>
         </section>
 
         <footer class="bg-[#030406] border-t border-slate-900 mt-20 pt-20 pb-10 px-10">
-            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 text-center md:text-left">
-                <div>
-                    <h3 class="serif-font text-2xl text-amber-500 italic font-black mb-6">UNDERLIGHT</h3>
-                    <p class="text-slate-500 text-xs italic mb-6">Tôn vinh cống hiến phía sau ánh hào quang.</p>
-                    <div class="flex gap-4 justify-center md:justify-start">
-                        <a href="https://www.facebook.com/profile.php?id=61576129833584" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 inline-flex items-center justify-center hover:bg-[#1877f2] transition-all"><i class="fab fa-facebook-f"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-white text-[10px] font-black uppercase tracking-[0.3em] mb-6">Chính Sách</h4>
-                    <ul class="text-slate-500 text-[10px] space-y-4 font-bold uppercase tracking-widest italic cursor-pointer">
-                        <li onclick="openPolicy('copyright')" class="hover:text-amber-500 transition-all">Bản quyền hình ảnh</li>
-                        <li onclick="openPolicy('privacy')" class="hover:text-amber-500 transition-all">Bảo mật thông tin</li>
-                        <li onclick="openPolicy('rules')" class="hover:text-amber-500 transition-all">Nội quy kịch đoàn</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white text-[10px] font-black uppercase tracking-[0.3em] mb-6">Phát Triển</h4>
-                    <a href="https://www.facebook.com/208.Hazee" target="_blank" class="text-amber-700 text-[9px] font-black uppercase tracking-[0.2em] italic hover:text-amber-400 transition-all duration-300 flex items-center gap-2 justify-center md:justify-start">
-                        <i class="fab fa-facebook-square text-lg"></i> Developer: Mậu Thân (Hazee)
-                    </a>
-                </div>
-                <div>
-                    <h4 class="text-white text-[10px] font-black uppercase tracking-[0.3em] mb-6">Kết Nối</h4>
-                    <p class="text-slate-500 text-[11px]"><i class="fas fa-envelope text-amber-900 mr-2"></i> contact@underlight.clb</p>
-                </div>
-            </div>
-            <div class="text-center pt-10 border-t border-slate-900">
-                <p class="text-slate-700 text-[9px] uppercase tracking-[0.5em] font-black">© 2026 UnderLight. Powered by Hazee.</p>
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
+                <div><h3 class="text-2xl text-amber-500 italic font-black mb-4">UNDERLIGHT</h3><a href="https://www.facebook.com/profile.php?id=61576129833584" target="_blank" class="text-[#1877f2] text-xs font-bold uppercase hover:underline"><i class="fab fa-facebook mr-1"></i> Fanpage</a></div>
+                <div><h4 class="text-white text-[10px] font-black uppercase mb-6">Chính Sách</h4><ul class="text-slate-500 text-[10px] space-y-4 font-bold uppercase italic cursor-pointer"><li onclick="openPolicy('copyright')">Bản quyền hình ảnh</li><li onclick="openPolicy('privacy')">Bảo mật thông tin</li><li onclick="openPolicy('rules')">Nội quy kịch đoàn</li></ul></div>
+                <div><h4 class="text-white text-[10px] font-black uppercase mb-6">Director</h4><a href="https://www.facebook.com/208.Hazee" target="_blank" class="text-amber-700 text-[9px] font-black uppercase tracking-widest italic hover:text-amber-400">Developer: Mậu Thân (Hazee)</a></div>
             </div>
         </footer>
     </main>
@@ -166,19 +137,19 @@
         <div class="absolute inset-0 bg-black/90 backdrop-blur-2xl"></div>
         <button onclick="showView('main')" class="absolute top-10 left-10 text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest z-50 transition-all"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
         <div class="glass-box w-full max-w-sm p-12 rounded-[2.5rem] shadow-2xl z-10 animate__animated animate__zoomIn">
-            <div class="text-center mb-10"><h2 class="serif-font text-4xl text-amber-500 italic mb-2 font-black">Truy Cập</h2></div>
-            <div id="authContent">
+            <div class="text-center mb-10"><h2 id="authTitle" class="text-4xl text-amber-500 italic font-black">Truy Cập</h2></div>
+            <div id="authContent" class="space-y-6">
                 <div id="formLogin" class="space-y-6">
                     <input type="text" id="loginUser" class="input-auth" placeholder="Username">
                     <input type="password" id="loginPass" class="input-auth" placeholder="Password">
-                    <button onclick="handleLogin()" class="w-full bg-amber-700 py-4 rounded-xl font-bold text-[10px] tracking-widest uppercase text-white shadow-xl transition-all">Đăng nhập</button>
-                    <p class="text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">Chưa có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthForm(false)" class="text-amber-500 hover:underline ml-1">Đăng ký</a></p>
+                    <button onclick="handleLogin()" class="w-full bg-amber-700 hover:bg-amber-600 py-4 rounded-xl font-bold text-[10px] tracking-widest uppercase text-white shadow-xl transition-all">Đăng nhập</button>
+                    <p class="text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">Chưa có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthForm(false)" class="text-amber-500 hover:underline">Đăng ký</a></p>
                 </div>
                 <div id="formRegister" class="space-y-6 hidden">
                     <input type="text" id="regUser" class="input-auth" placeholder="Username mới">
                     <input type="password" id="regPass" class="input-auth" placeholder="Mật khẩu">
-                    <button onclick="handleRegister()" class="w-full bg-slate-800 py-4 rounded-xl font-bold text-[10px] tracking-widest uppercase text-white transition-all">Tạo tài khoản</button>
-                    <p class="text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">Đã có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthForm(true)" class="text-amber-500 hover:underline ml-1">Đăng nhập</a></p>
+                    <button onclick="handleRegister()" class="w-full bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-bold text-[10px] tracking-widest uppercase text-white transition-all">Tạo tài khoản</button>
+                    <p class="text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">Đã có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthForm(true)" class="text-amber-500 hover:underline">Quay lại</a></p>
                 </div>
             </div>
         </div>
@@ -186,7 +157,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, setDoc, getDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyATKXFYxPhRm_zzfNYrZKkDawvgXAyw9HI",
@@ -202,89 +173,69 @@
         const IMGBB_API_KEY = "ee6a9bb3e3a7aa30b463939b8a91a18b";
 
         let currentUser = JSON.parse(localStorage.getItem('underlight_user')) || null;
+        let activeSnapshot = null; // Quản lý kết nối database
 
         const policies = {
-            copyright: {
-                title: "Bản Quyền Hình Ảnh",
-                content: `<p class='mb-4'>Tất cả hình ảnh nghệ sĩ trên website thuộc sở hữu của UnderLight. Nghiêm cấm sử dụng cho mục đích thương mại trái phép.</p>`
-            },
-            privacy: {
-                title: "Bảo Mật Thông Tin",
-                content: `<p class='mb-4'>Dữ liệu thành viên được bảo vệ an toàn trên nền tảng Google Firebase. Chúng tôi không chia sẻ thông tin cho bên thứ ba.</p>`
-            },
-            rules: {
-                title: "Nội Quy Kịch Đoàn",
-                content: `<p class='mb-4'>Tôn trọng nghệ thuật, giữ gìn hình ảnh kịch đoàn. Chỉ Admin được phép chỉnh sửa hồ sơ nhân sự.</p>`
-            }
+            copyright: { title: "Bản Quyền Hình Ảnh", content: "Toàn bộ hình ảnh nghệ sĩ trên website thuộc sở hữu UnderLight. Nghiêm cấm sao chép trái phép." },
+            privacy: { title: "Bảo Mật Thông Tin", content: "Dữ liệu được bảo mật trên Google Firebase. Cam kết không cung cấp cho bên thứ ba." },
+            rules: { title: "Nội Quy Kịch Đoàn", content: "Thành viên tôn trọng văn hóa nghệ thuật. Chỉ Admin mới được thay đổi dữ liệu nhân sự." }
         };
 
         window.openPolicy = (type) => {
             const data = policies[type];
-            document.getElementById('policy-content').innerHTML = `
-                <h3 class="serif-font text-3xl text-amber-500 mb-6 italic">${data.title}</h3>
-                <div class="text-sm leading-relaxed text-slate-300">${data.content}</div>
-                <button onclick="closePolicy()" class="mt-10 bg-amber-900/30 border border-amber-600 text-amber-500 px-8 py-3 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-amber-600 hover:text-white transition-all">Đã hiểu</button>
-            `;
+            document.getElementById('policy-content').innerHTML = `<h3 class="text-3xl text-amber-500 mb-6 italic font-black">${data.title}</h3><p>${data.content}</p><button onclick="closePolicy()" class="mt-10 bg-amber-900/30 border border-amber-600 text-amber-500 px-8 py-3 rounded-full text-[10px] font-black uppercase hover:bg-amber-600 hover:text-white transition-all">Đã hiểu</button>`;
             document.getElementById('policy-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         };
 
-        window.closePolicy = () => {
-            document.getElementById('policy-modal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        };
+        window.closePolicy = () => { document.getElementById('policy-modal').classList.remove('active'); document.body.style.overflow = 'auto'; };
 
-        window.showView = (name) => {
+        window.showView = (id) => {
             document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
-            document.getElementById('view-' + name).classList.add('active-view');
-            if(name === 'main') loadMembers();
-        };
+            document.getElementById('section-home').classList.add('hidden');
+            document.getElementById('section-members').classList.add('hidden');
+            document.getElementById('section-guide').classList.add('hidden');
+            
+            // Xóa rác dữ liệu để trang chủ luôn sạch
+            if (id !== 'members') document.getElementById('memberContainer').innerHTML = '';
 
-        window.handleLogin = async () => {
-            const user = document.getElementById('loginUser').value;
-            const pass = document.getElementById('loginPass').value;
-            if(user === "ADMIN" && pass === "ADMIN123") { loginSuccess({ username: "ADMIN", role: "admin" }); return; }
-            try {
-                const snap = await getDoc(doc(db, "users", user));
-                if(snap.exists() && snap.data().password === pass) { loginSuccess(snap.data()); }
-                else { alert("Sai thông tin!"); }
-            } catch (e) { alert("Lỗi kết nối!"); }
-        };
-
-        function loginSuccess(data) {
-            currentUser = data;
-            localStorage.setItem('underlight_user', JSON.stringify(data));
-            updateAuthStatus();
-            alert("Đăng nhập thành công!");
-            showView('main');
-        }
-
-        window.handleLogout = () => {
-            currentUser = null;
-            localStorage.removeItem('underlight_user');
-            updateAuthStatus();
-            showView('main');
-        };
-
-        function updateAuthStatus() {
-            if(currentUser) {
-                document.body.classList.add('is-logged-in');
-                document.getElementById('userDisplay').innerText = currentUser.username;
-                if(currentUser.role === 'admin') document.body.classList.add('is-admin');
-                else document.body.classList.remove('is-admin');
+            if (id === 'auth') {
+                document.getElementById('view-auth').classList.add('active-view');
             } else {
-                document.body.classList.remove('is-logged-in', 'is-admin');
+                document.getElementById('view-main').classList.add('active-view');
+                if (id === 'main') document.getElementById('section-home').classList.remove('hidden');
+                if (id === 'members') {
+                    document.getElementById('section-members').classList.remove('hidden');
+                    document.getElementById('currentGenDisplay').innerText = "Tất Cả Nghệ Sĩ";
+                    loadMembers();
+                }
+                if (id === 'guide') document.getElementById('section-guide').classList.remove('hidden');
+                window.scrollTo(0, 0);
             }
-        }
+        };
 
-        function loadMembers() {
+        window.showGen = (genName) => {
+            showView('members');
+            document.getElementById('currentGenDisplay').innerText = genName;
+            loadMembers(genName);
+        };
+
+        function loadMembers(filter = null) {
+            if (activeSnapshot) activeSnapshot(); // Tắt kết nối cũ
             const container = document.getElementById('memberContainer');
-            onSnapshot(query(collection(db, "club_members"), orderBy("createdAt", "desc")), (snap) => {
+            container.innerHTML = '<p class="col-span-full text-center text-[10px] animate-pulse uppercase tracking-widest italic">// Connecting...</p>';
+            
+            let q = query(collection(db, "club_members"));
+            if (filter) q = query(collection(db, "club_members"), where("gen", "==", filter));
+            else q = query(collection(db, "club_members"), orderBy("createdAt", "desc"));
+
+            activeSnapshot = onSnapshot(q, (snap) => {
                 container.innerHTML = '';
+                if(snap.empty) container.innerHTML = '<p class="col-span-full text-center text-slate-700 italic text-[10px]">// Empty</p>';
                 snap.forEach(item => {
                     const d = item.data();
                     container.innerHTML += `
-                        <div class="actor-card card-bg rounded-2xl relative group animate__animated animate__fadeIn">
+                        <div class="actor-card card-bg relative group animate__animated animate__fadeIn">
                             <button onclick="deleteMember('${item.id}')" class="admin-only absolute top-4 right-4 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center z-50 shadow-2xl transition-all hover:scale-110"><i class="fas fa-trash-alt"></i></button>
                             <div class="h-80 overflow-hidden relative border-b border-slate-900 rounded-t-2xl">
                                 <img src="${d.image}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000">
@@ -292,30 +243,68 @@
                             </div>
                             <div class="p-6">
                                 <span class="text-[8px] font-black text-amber-500 uppercase bg-amber-500/10 px-2 py-1 rounded-full border border-amber-900/30">${d.role}</span>
-                                <h3 class="serif-font text-3xl text-white mt-2 mb-1">${d.name}</h3>
+                                <h3 class="text-3xl text-white mt-2 mb-1 font-black tracking-tighter">${d.name}</h3>
                                 <p class="text-slate-400 text-[10px] italic border-l border-amber-800 pl-3">"${d.bio}"</p>
                             </div>
                         </div>`;
                 });
+                updateAuthStatus();
             });
+        }
+
+        window.handleLogin = async () => {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            if(user === "ADMIN" && pass === "ADMIN123") { loginSuccess({ username: "ADMIN", role: "admin" }); return; }
+            try {
+                const snap = await getDoc(doc(db, "users", user));
+                if(snap.exists() && snap.data().password === pass) loginSuccess(snap.data());
+                else alert("Sai thông tin!");
+            } catch (e) { alert("Lỗi!"); }
+        };
+
+        window.handleRegister = async () => {
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            if(!user || !pass) return alert("Vui lòng điền đủ!");
+            try {
+                const userRef = doc(db, "users", user);
+                const check = await getDoc(userRef);
+                if(check.exists()) return alert("Username đã tồn tại!");
+                await setDoc(userRef, { username: user, password: pass, role: 'member' });
+                alert("Thành công!"); toggleAuthForm(true);
+            } catch (e) { alert("Lỗi!"); }
+        };
+
+        function loginSuccess(data) {
+            currentUser = data; localStorage.setItem('underlight_user', JSON.stringify(data));
+            updateAuthStatus(); alert("Chào mừng " + data.username + "!"); showView('main');
+        }
+
+        window.handleLogout = () => { currentUser = null; localStorage.removeItem('underlight_user'); updateAuthStatus(); showView('main'); };
+
+        function updateAuthStatus() {
+            if(currentUser) {
+                document.body.classList.add('is-logged-in');
+                document.getElementById('userDisplay').innerText = currentUser.username;
+                if(currentUser.role === 'admin') document.body.classList.add('is-admin');
+            } else { document.body.classList.remove('is-logged-in', 'is-admin'); }
         }
 
         window.uploadAndPush = async () => {
             const f = document.getElementById('mFile').files[0];
             const name = document.getElementById('mName').value;
-            const btn = document.getElementById('submitBtn');
-            if(!f || !name) return alert("Thiếu dữ liệu!");
-            btn.disabled = true;
+            const gen = document.getElementById('mGen').value;
+            if(!f || !name) return alert("Vui lòng chọn ảnh và tên!");
             try {
                 const formData = new FormData(); formData.append("image", f);
                 const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const result = await res.json();
-                if(result.success) {
-                    await addDoc(collection(db, "club_members"), { name, role: document.getElementById('mRole').value, bio: document.getElementById('mBio').value, image: result.data.url, createdAt: new Date() });
-                    alert("Thành công!");
+                const r = await res.json();
+                if(r.success) {
+                    await addDoc(collection(db, "club_members"), { gen, name, role: document.getElementById('mRole').value, bio: document.getElementById('mBio').value, image: r.data.url, createdAt: new Date() });
+                    alert("Đã lưu!");
                 }
             } catch (e) { alert("Lỗi!"); }
-            finally { btn.disabled = false; }
         };
 
         window.deleteMember = async (id) => { if(confirm("Xóa nghệ sĩ này?")) await deleteDoc(doc(db, "club_members", id)); };
@@ -326,7 +315,7 @@
         };
 
         updateAuthStatus();
-        loadMembers();
+        showView('main'); // Mặc định chỉ hiện trang chủ trống
     </script>
 </body>
-</html>
+</html>	
