@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnderLight | Sau Ánh Hào Quang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Fira+Code&family=Inter:wght@400;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #05070a; color: #e2e8f0; overflow-x: hidden; }
+        .serif-font { font-family: 'Playfair Display', serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+
+        /* Giữ lại hiệu ứng tỏa sáng cho Logo nhưng không xoay */
+        .logo-static {
+            filter: drop-shadow(0 0 30px rgba(180, 83, 9, 0.4));
+            transition: transform 0.5s ease;
+        }
+        .logo-static:hover { transform: scale(1.02); }
+
+        /* Hiệu ứng chữ UnderLight lấp lánh */
+        .shimmer-text {
+            background: linear-gradient(to right, #b45309 20%, #fde68a 50%, #b45309 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* Card Nghệ Sĩ */
+        .actor-card { 
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); 
+            border: 1px solid #1e293b;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+        }
+        .actor-card:hover { 
+            border-color: #f59e0b;
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(180, 83, 9, 0.3);
+        }
+        .actor-card img { transition: transform 1s ease, filter 0.8s ease; }
+        .actor-card:hover img { transform: scale(1.08); filter: grayscale(0); }
+
+        .admin-controls { display: none; z-index: 100; }
+        
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(180, 83, 9, 0.03) 0%, transparent 70%);
+            pointer-events: none; z-index: -1;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div class="bg-glow"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col items-center text-center mb-16 animate__animated animate__fadeIn">
+            <div class="w-64 h-64 md:w-80 md:h-80 mb-6 logo-static">
+                <img src="https://i.ibb.co/99XfbWCS/image-3fe3a8.jpg" alt="UnderLight Logo" class="w-full h-full object-contain rounded-full shadow-2xl">
+            </div>
+            
+            <h1 class="serif-font text-6xl md:text-8xl font-black tracking-tighter uppercase shimmer-text italic">
+                UnderLight
+            </h1>
+            <p class="text-amber-600 tracking-[0.5em] font-bold text-sm md:text-xl uppercase italic mt-2">
+                Sau Ánh Hào Quang
+            </p>
+            
+            <div class="mt-12 flex flex-col md:flex-row items-center gap-6 w-full justify-between border-t border-slate-800 pt-10">
+                <div class="text-left">
+                    <h2 class="text-2xl font-black text-white tracking-widest uppercase italic">DANH SÁCH THÀNH VIÊN</h2>
+                    <p class="text-slate-500 code-font text-[10px] mt-1 italic tracking-[0.2em]">// Status: Mậu Thân (Hazee)</p>
+                </div>
+                <button onclick="toggleAdmin()" id="adminBtn" class="bg-amber-900/10 border border-amber-700/50 hover:bg-amber-600 text-amber-500 hover:text-white px-12 py-3 rounded-sm text-[11px] font-black tracking-[0.4em] transition-all uppercase">
+                    [ ADMIN ]
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+            <aside id="adminPanel" class="hidden lg:col-span-1">
+                <div class="bg-slate-900 border-l-4 border-amber-600 p-6 shadow-2xl sticky top-10 rounded-r-xl">
+                    <h2 class="text-amber-500 font-black mb-6 text-xs uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-theater-masks"></i> Quản Lý Nghệ Sĩ
+                    </h2>
+                    <div class="space-y-4">
+                        <input type="text" id="mUrl" placeholder="Link ảnh chân dung..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded text-sm outline-none focus:border-amber-500 text-white">
+                        <input type="text" id="mName" placeholder="Tên nghệ sĩ..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded text-sm outline-none focus:border-amber-500 text-white">
+                        <input type="text" id="mRole" placeholder="Chức vụ/Vai diễn..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded text-sm outline-none focus:border-amber-500 text-white">
+                        <textarea id="mBio" placeholder="Giới thiệu nghệ sĩ..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded text-sm h-28 outline-none focus:border-amber-500 text-white"></textarea>
+                        <button onclick="pushMember()" id="submitBtn" class="w-full bg-amber-700 hover:bg-amber-600 text-white font-bold py-4 rounded text-[10px] tracking-widest uppercase transition-all shadow-lg active:scale-95">
+                            CẬP NHẬT DỮ LIỆU
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-3">
+                <div id="memberContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyATKXFYxPhRm_zzfNYrZKkDawvgXAyw9HI",
+          authDomain: "source-78e8e.firebaseapp.com",
+          projectId: "source-78e8e",
+          storageBucket: "source-78e8e.firebasestorage.app",
+          messagingSenderId: "174951881154",
+          appId: "1:174951881154:web:a962d6d91a0d1c076ade5b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        onSnapshot(query(collection(db, "club_members"), orderBy("createdAt", "desc")), (snapshot) => {
+            const container = document.getElementById('memberContainer');
+            container.innerHTML = '';
+            snapshot.forEach((item) => {
+                const data = item.data();
+                const id = item.id;
+                container.innerHTML += `
+                    <div class="actor-card rounded-2xl overflow-hidden relative group animate__animated animate__fadeInUp">
+                        <button onclick="deleteMember('${id}')" class="admin-controls absolute top-4 right-4 bg-red-600 hover:bg-red-500 text-white w-10 h-10 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <div class="h-80 overflow-hidden relative">
+                            <img src="${data.image}" class="w-full h-full object-cover grayscale transition-all" onerror="this.src='https://via.placeholder.com/300x400?text=Lỗi+Ảnh'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#05070a] via-transparent opacity-90"></div>
+                        </div>
+                        <div class="p-6 absolute bottom-0 left-0 right-0">
+                            <span class="text-[8px] font-black tracking-[0.3em] text-amber-500 uppercase bg-amber-500/10 px-2 py-1">${data.role}</span>
+                            <h3 class="serif-font text-3xl text-white mt-2 mb-2 tracking-tight">${data.name}</h3>
+                            <p class="text-slate-400 text-xs italic opacity-0 group-hover:opacity-100 transition-all duration-500 border-l border-amber-800 pl-3 translate-y-2 group-hover:translate-y-0">"${data.bio}"</p>
+                        </div>
+                    </div>`;
+            });
+            updateAdminView();
+        });
+
+        window.pushMember = async () => {
+            const url = document.getElementById('mUrl').value;
+            const name = document.getElementById('mName').value;
+            const role = document.getElementById('mRole').value;
+            const bio = document.getElementById('mBio').value;
+            if(!url || !name) return alert("Hệ thống yêu cầu Ảnh và Tên!");
+            try {
+                await addDoc(collection(db, "club_members"), { name, role, bio, image: url, createdAt: new Date() });
+                document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+            } catch (e) { alert("Lỗi Database!"); }
+        };
+
+        window.deleteMember = async (id) => { if(confirm("Xóa vĩnh viễn nghệ sĩ này?")) await deleteDoc(doc(db, "club_members", id)); };
+
+        let isAdmin = false;
+        window.toggleAdmin = () => {
+            if(prompt("Mã ADMIN:") === "admin123") {
+                isAdmin = true;
+                updateAdminView();
+                document.getElementById('adminBtn').innerText = "[ ADMIN_ONLINE ]";
+                document.getElementById('adminBtn').classList.add('bg-amber-700', 'text-white');
+            }
+        };
+
+        function updateAdminView() {
+            const panel = document.getElementById('adminPanel');
+            if (panel) panel.style.display = isAdmin ? 'block' : 'none';
+            document.querySelectorAll('.admin-controls').forEach(btn => btn.style.display = isAdmin ? 'flex' : 'none');
+        }
+    </script>
+</body>
+</html>
